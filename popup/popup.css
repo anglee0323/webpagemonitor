@@ -1,0 +1,615 @@
+/**
+ * 区块链页面监控器 - Google Material Design 风格
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Google Material Design 配色 */
+  --primary-color: #1a73e8;
+  --primary-hover: #1765cc;
+  --success-color: #1e8e3e;
+  --warning-color: #f9ab00;
+  --error-color: #d93025;
+  --bg-primary: #F3F3F3;
+  --bg-secondary: #f8f9fa;
+  --bg-hover: #f1f3f4;
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --border-color: #dadce0;
+  --shadow-1: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  --shadow-2: 0 1px 3px 0 rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+}
+
+
+body {
+  width: 380px;
+  min-height: 500px;
+  max-height: 700px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  padding: 12px;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-top: -12px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* 头部标题 */
+.header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.status-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 按钮基础样式 */
+.btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Google Sans', sans-serif;
+}
+
+/* 章节标题 */
+.add-section h3,
+.monitor-list h3,
+.settings h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.monitor-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 小按钮样式 */
+.btn-small {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+/* 添加URL表单 */
+.add-section {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: none;
+  box-shadow: var(--shadow-1);
+}
+
+.add-section h3 {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-field {
+  padding: 10px 12px;
+  background: #f1f3f4;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.input-field:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.input-field::placeholder {
+  color: var(--text-secondary);
+}
+
+.btn-add {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  border: none;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-1);
+  width: 100%;
+}
+
+.btn-add:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-2);
+}
+
+
+/* 监控列表 */
+.monitor-list {
+  margin-bottom: 20px;
+}
+
+.monitor-list h3 {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  padding-left: 4px;
+}
+
+.monitor-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+/* 滚动条样式 */
+.monitor-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.monitor-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.monitor-items::-webkit-scrollbar-thumb {
+  background: #dadce0;
+  border-radius: 3px;
+}
+
+.monitor-items::-webkit-scrollbar-thumb:hover {
+  background: #bdc1c6;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-state p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.hint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.monitor-item {
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.monitor-item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.monitor-item.active {
+  border-left: 4px solid var(--success-color);
+}
+
+.monitor-item.error {
+  border-left: 4px solid var(--error-color);
+}
+
+.monitor-item.inactive {
+  opacity: 0.85;
+}
+
+.monitor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.monitor-info {
+  flex: 1;
+  min-width: 0;
+  margin-right: 12px;
+}
+
+.monitor-name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.monitor-url {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+
+.monitor-url:hover {
+  color: var(--primary-color);
+}
+
+.monitor-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.btn-icon:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--error-color);
+}
+
+.monitor-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f3f4;
+  margin-top: 8px;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.status-badge.active {
+  background: transparent;
+  color: var(--success-color);
+  padding: 0;
+}
+
+.status-badge.inactive {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0;
+}
+
+.status-badge.error {
+  background: transparent;
+  color: var(--error-color);
+  padding: 0;
+}
+
+.last-check {
+  color: #9aa0a6;
+  font-size: 11px;
+}
+
+.error-message {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fce8e6;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #c5221f;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-info {
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: #e8f0fe;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #1967d2;
+  display: inline-block;
+}
+
+
+/* 设置面板 */
+.settings {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.settings h3 {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.setting-item {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting-item label {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.select-field {
+  padding: 6px 10px;
+  background: #f1f3f4;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 140px;
+  transition: all 0.2s;
+}
+
+.select-field:focus {
+  outline: none;
+  background: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-item span {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+/* 小按钮样式 */
+.btn-small {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-success {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.btn-success:hover {
+  background: #ceead6;
+  box-shadow: none;
+}
+
+.btn-warning {
+  background: #fef7e0;
+  color: #b06000;
+}
+
+
+.btn-warning:hover {
+  background: #feefc3;
+  box-shadow: none;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #202124;
+    --bg-secondary: #292a2d;
+    --bg-hover: #35363a;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0a6;
+    --border-color: #3c4043;
+    --shadow-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+    --shadow-2: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 深色模式特定样式覆盖 */
+  .header,
+  .add-section,
+  .settings,
+  .monitor-item {
+    background: #2d2e31;
+  }
+
+  .input-field,
+  .select-field {
+    background: #202124;
+    color: #e8eaed;
+  }
+
+  .input-field:focus,
+  .select-field:focus {
+    background: #303134;
+    border-color: #8ab4f8;
+  }
+
+  .btn-secondary {
+    background: #2d2e31;
+    color: #e8eaed;
+    border-color: #5f6368;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: #3c4043;
+  }
+
+  .btn-success {
+    background: rgba(30, 142, 62, 0.2);
+    color: #81c995;
+  }
+
+  .btn-success:hover {
+    background: rgba(30, 142, 62, 0.3);
+  }
+
+  .btn-warning {
+    background: rgba(249, 171, 0, 0.2);
+    color: #fdd663;
+  }
+
+  .btn-warning:hover {
+    background: rgba(249, 171, 0, 0.3);
+  }
+
+  .monitor-status {
+    border-top-color: #3c4043;
+  }
+
+  .error-message {
+    background: rgba(217, 48, 37, 0.2);
+    color: #f28b82;
+  }
+
+  .history-info {
+    background: rgba(26, 115, 232, 0.2);
+    color: #8ab4f8;
+  }
+
+  .monitor-items::-webkit-scrollbar-thumb,
+  .monitor-items::-webkit-scrollbar-track {
+    background: #202124;
+  }
+
+  .monitor-items::-webkit-scrollbar-thumb {
+    background: #5f6368;
+  }
+
+  .monitor-items::-webkit-scrollbar-thumb:hover {
+    background: #9aa0a6;
+  }
+
+  .btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
