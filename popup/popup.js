@@ -59,6 +59,7 @@ async function loadData() {
  * 渲染监控列表
  */
 function renderMonitors() {
+    console.log('[渲染] renderMonitors 开始, monitors数量:', monitors.length);
     const container = document.getElementById('monitorItems');
     const emptyState = document.getElementById('emptyState');
     const countEl = document.getElementById('monitorCount');
@@ -72,12 +73,13 @@ function renderMonitors() {
 
     if (monitors.length === 0) {
         emptyState.style.display = 'block';
+        container.innerHTML = '';
         return;
     }
 
     emptyState.style.display = 'none';
 
-    container.innerHTML = monitors.map(monitor => {
+    const html = monitors.map(monitor => {
         const lastCheckText = monitor.lastCheck
             ? formatTimestamp(monitor.lastCheck)
             : '未检查';
@@ -119,8 +121,14 @@ function renderMonitors() {
     `;
     }).join('');
 
-    // 重新绑定事件
-    bindMonitorEvents();
+    container.innerHTML = html;
+    console.log('[渲染] HTML已更新');
+
+    // 使用setTimeout确保DOM更新完成后再绑定事件
+    setTimeout(() => {
+        bindMonitorEvents();
+        console.log('[渲染] 事件已绑定');
+    }, 0);
 }
 
 /**
