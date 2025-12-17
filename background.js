@@ -306,26 +306,26 @@ async function handleChange(monitor, settings) {
         }
     }
 
-    // 4. 屏幕弹窗提醒 (仍需通过 content script)
+    // 4. 屏幕弹窗提醒 (独立置顶窗口)
     if (settings.popupAlert) {
         try {
-            const tabs = await chrome.tabs.query({});
-            for (const tab of tabs) {
-                if (tab.id && tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
-                    try {
-                        await chrome.tabs.sendMessage(tab.id, {
-                            type: 'SHOW_ALERT',
-                            message: `🚨 ${monitor.name || monitor.url}\n检测到变化!`
-                        });
-                        console.log('✅ Alert消息已发送到标签页:', tab.id);
-                        break;
-                    } catch (e) {
-                        console.log('标签页', tab.id, '消息发送失败:', e.message);
-                    }
-                }
-            }
+            const alertUrl = chrome.runtime.getURL('alert.html') +
+                `?url=${encodeURIComponent(monitor.url)}` +
+                `&name=${encodeURIComponent(monitor.name || monitor.url)}`;
+
+            await chrome.windows.create({
+                url: alertUrl,
+                type: 'popup',
+                width: 420,
+                height: 320,
+                focused: true,
+                top: 100,
+                left: Math.floor((screen.width - 420) / 2)
+            });
+
+            console.log('✅ 独立弹窗窗口已创建');
         } catch (error) {
-            console.error('发送弹窗消息失败:', error);
+            console.error('创建弹窗窗口失败:', error);
         }
     }
 
