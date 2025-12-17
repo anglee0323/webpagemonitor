@@ -14,6 +14,36 @@ function quickHash(str) {
     return hash.toString(36);
 }
 
+// ===== Offscreen Document 管理 =====
+/**
+ * 确保 offscreen document 已创建
+ * 用于可靠的声音播放，不依赖用户标签页状态
+ */
+async function setupOffscreenDocument() {
+    try {
+        // 检查是否已存在 offscreen document
+        const existingContexts = await chrome.runtime.getContexts({
+            contextTypes: ['OFFSCREEN_DOCUMENT']
+        });
+
+        if (existingContexts.length > 0) {
+            console.log('Offscreen document 已存在');
+            return;
+        }
+
+        // 创建 offscreen document
+        await chrome.offscreen.createDocument({
+            url: 'offscreen.html',
+            reasons: ['AUDIO_PLAYBACK'],
+            justification: '播放监控变化的提示音'
+        });
+
+        console.log('✅ Offscreen document 已创建');
+    } catch (error) {
+        console.error('创建 offscreen document 失败:', error);
+    }
+}
+
 // ===== 监控核心功能 =====
 async function fetchPageContent(url) {
     try {
@@ -261,44 +291,45 @@ async function handleChange(monitor, settings) {
         console.error('徽章设置失败:', e);
     }
 
+    // 3. 声音播放 (通过 offscreen document)
+    if (settings.soundEnabled) {
+        try {
+            await setupOffscreenDocument();
+            await chrome.runtime.sendMessage({
+                type: 'PLAY_BEEP',
+                soundType: settings.soundType || 'chime',
+                duration: settings.soundDuration || 3
+            });
+            console.log('✅ 声音消息已发送到 offscreen document');
+        } catch (error) {
+            console.error('播放声音失败:', error);
+        }
+    }
 
-    // 3. 声音和弹窗 (可选)
-    if (settings.soundEnabled || settings.popupAlert) {
-        console.log('尝试播放声音或显示弹窗...');
+    // 4. 屏幕弹窗提醒 (仍需通过 content script)
+    if (settings.popupAlert) {
         try {
             const tabs = await chrome.tabs.query({});
-            console.log('找到标签页:', tabs.length);
-
             for (const tab of tabs) {
                 if (tab.id && tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
                     try {
-                        if (settings.soundEnabled) {
-                            await chrome.tabs.sendMessage(tab.id, {
-                                type: 'PLAY_BEEP',
-                                soundType: settings.soundType || 'chime',
-                                duration: settings.soundDuration || 3
-                            });
-                            console.log('✅ 声音消息已发送到标签页:', tab.id);
-                        }
-                        if (settings.popupAlert) {
-                            await chrome.tabs.sendMessage(tab.id, {
-                                type: 'SHOW_ALERT',
-                                message: `🚨 ${monitor.name || monitor.url}\n检测到变化!`
-                            });
-                            console.log('✅ Alert消息已发送到标签页:', tab.id);
-                        }
-                        break; // 成功一次就够了
+                        await chrome.tabs.sendMessage(tab.id, {
+                            type: 'SHOW_ALERT',
+                            message: `🚨 ${monitor.name || monitor.url}\n检测到变化!`
+                        });
+                        console.log('✅ Alert消息已发送到标签页:', tab.id);
+                        break;
                     } catch (e) {
                         console.log('标签页', tab.id, '消息发送失败:', e.message);
                     }
                 }
             }
         } catch (error) {
-            console.error('发送消息到标签页失败:', error);
+            console.error('发送弹窗消息失败:', error);
         }
     }
 
-    // 4. 自动打开页面
+    // 5. 自动打开页面
     if (settings.autoOpen) {
         try {
             await chrome.tabs.create({ url: monitor.url, active: true });
