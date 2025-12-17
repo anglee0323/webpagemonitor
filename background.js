@@ -318,9 +318,7 @@ async function handleChange(monitor, settings) {
                 type: 'popup',
                 width: 420,
                 height: 320,
-                focused: true,
-                top: 100,
-                left: Math.floor((screen.width - 420) / 2)
+                focused: true
             });
 
             console.log('✅ 独立弹窗窗口已创建');
