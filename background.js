@@ -201,6 +201,9 @@ async function performCheck() {
     const checkPromises = activeMonitors.map(async (monitor) => {
         try {
             const result = await detectChange(monitor.url, monitor.lastHash);
+            
+            // 记录上一次的错误状态
+            const hadError = !!monitor.lastError;
 
             if (result.error) {
                 console.error(`检查失败 ${monitor.url}:`, result.error);
@@ -215,9 +218,18 @@ async function performCheck() {
             monitor.lastCheck = Date.now();
             monitor.lastError = null;
 
-            // 如果检测到变化
-            if (result.changed) {
-                console.log(`🚨 检测到变化: ${monitor.url}`);
+            // 检测变化的两种情况：
+            // 1. 正常的内容变化 (result.changed = true)
+            // 2. 从错误状态恢复到正常状态 (hadError = true, 现在没错误)
+            const shouldAlert = result.changed || hadError;
+
+            if (shouldAlert) {
+                if (hadError) {
+                    console.log(`🎉 页面已上线: ${monitor.url} (从错误状态恢复)`);
+                } else {
+                    console.log(`🚨 检测到变化: ${monitor.url}`);
+                }
+                
                 await handleChange(monitor, settings);
 
                 // 记录到历史
@@ -226,7 +238,8 @@ async function performCheck() {
                 }
                 monitor.history.unshift({
                     timestamp: Date.now(),
-                    hash: result.currentHash
+                    hash: result.currentHash,
+                    type: hadError ? 'recovery' : 'change'
                 });
                 // 只保留最近10条历史
                 monitor.history = monitor.history.slice(0, 10);
