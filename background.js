@@ -313,11 +313,22 @@ async function handleChange(monitor, settings) {
                 `?url=${encodeURIComponent(monitor.url)}` +
                 `&name=${encodeURIComponent(monitor.name || monitor.url)}`;
 
+            // 获取当前窗口信息来计算居中位置
+            const currentWindow = await chrome.windows.getCurrent();
+            const windowWidth = 450;
+            const windowHeight = 380;
+
+            // 计算居中位置
+            const left = currentWindow.left + Math.floor((currentWindow.width - windowWidth) / 2);
+            const top = currentWindow.top + Math.floor((currentWindow.height - windowHeight) / 2);
+
             await chrome.windows.create({
                 url: alertUrl,
                 type: 'popup',
-                width: 420,
-                height: 320,
+                width: windowWidth,
+                height: windowHeight,
+                left: left,
+                top: top,
                 focused: true
             });
 
