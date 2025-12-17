@@ -144,39 +144,7 @@
         </div>
     </div>
 
-    <script>
-        // 从 URL 参数获取信息
-        const params = new URLSearchParams(window.location.search);
-        const url = params.get('url') || '未知页面';
-        const name = params.get('name') || url;
-
-        // 显示信息
-        document.getElementById('url').textContent = name;
-        document.getElementById('timestamp').textContent = new Date().toLocaleString('zh-CN');
-
-        // 打开页面按钮
-        document.getElementById('openBtn').addEventListener('click', () => {
-            chrome.tabs.create({ url: url, active: true });
-            window.close();
-        });
-
-        // 关闭按钮
-        document.getElementById('closeBtn').addEventListener('click', () => {
-            window.close();
-        });
-
-        // ESC 键关闭
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                window.close();
-            }
-        });
-
-        // 5秒后自动聚焦到"打开页面"按钮
-        setTimeout(() => {
-            document.getElementById('openBtn').focus();
-        }, 100);
-    </script>
+    <script src="alert.js"></script>
 </body>
 
 </html>
