@@ -134,6 +134,12 @@ function bindMonitorEvents() {
             const monitor = monitors.find(m => m.id === id);
             if (monitor) {
                 monitor.enabled = !monitor.enabled;
+
+                // 立即更新本地UI（不等待保存完成）
+                renderMonitors();
+                updateUI();
+
+                // 异步保存数据
                 await saveMonitors();
 
                 // 自动管理全局监控状态
@@ -148,7 +154,7 @@ function bindMonitorEvents() {
                     isMonitoring = false;
                 }
 
-                renderMonitors();
+                // 再次更新UI确保状态正确
                 updateUI();
             }
         });
@@ -334,7 +340,7 @@ async function addMonitor() {
     }
 
     // 添加新监控 - 默认暂停状态
-    monitors.push({
+    const newMonitor = {
         id: Date.now().toString(),
         url: url,
         name: nameInput.value.trim() || url,
@@ -342,9 +348,14 @@ async function addMonitor() {
         lastHash: null,
         lastCheck: null,
         addedAt: Date.now()
-    });
+    };
 
+    monitors.push(newMonitor);
+
+    // 保存到storage
     await saveMonitors();
+
+    // 立即更新UI
     renderMonitors();
     updateUI();
 
